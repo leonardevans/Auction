@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/main_layout}" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Auction Item</title>
+</head>
+<body>
+
+<div class="container" layout:fragment="content">
+    <div class="row mt-1">
+        <select id="selectCategory" class="form-select" aria-label="Default select example">
+            <option selected value="">Select Category</option>
+            <option th:each="category: ${categories}" th:value="${category.id}" th:text="${category.name}">One</option>
+        </select>
+    </div>
+
+    <div class="row mt-1">
+        <div class="col-md-4">
+            <div class="card mx-1">
+                <div class="card-body">
+                    <img th:src="@{${auctionItem.image}}" th:alt="${auctionItem.name}" class="img-thumbnail"/>
+                </div>
+                <div class="card-footer">
+                    <h4><a th:href="@{/item/{id} (id=${auctionItem.id})}">[[${auctionItem.name}]]</a></h4>
+                    <p>Starting bid: [[${auctionItem.startingBid}]] kr</p>
+                    <p>Ends on: <span id="item-closing-date">[[${auctionItem.closingDate}]]</span></p>
+                    <p th:unless="${auctionItem.closed}">Ends in: <span id="ends-in"></span></p>
+                    <form action=""  id="bid-form" th:unless="${auctionItem.closed}">
+                        <p id="bid-message" class=""></p>
+                        <div class="mb-3">
+                            <input type="number" step="any" id="user-bid" class="form-control" required />
+                            <input type="hidden" step="any" id="auction-item" class="form-control" th:value="${auctionItem.id}" />
+                        </div>
+                        <div class="mb-3">
+                            <input type="submit" class="btn-primary btn btn-sm" value="Bid"/>
+                        </div>
+                    </form>
+                    <div class="card" th:if="${auctionItem.closed && top3Bids.size() > 0}">
+                        <div class="card-header">
+                            <div class="card-header">
+                                <h4>Winner</h4>
+                            </div>
+                            <div class="card-body" >
+                                <p>Name: [[${top3Bids.get(0).bidder.name}]]</p>
+                                <p>Bid amount: [[${top3Bids.get(0).price}]] kr</p>
+                                <p>Date: [[${top3Bids.get(0).bidDate}]]</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card p-2">
+                <h4>Seller</h4>
+                <p>Name: <span th:text="${auctionItem.getSeller().name}"></span></p>
+                <p>Email: <span th:text="${auctionItem.getSeller().email}"></span></p>
+            </div>
+            <div class=" mt-2" th:if="${top3Bids.size() > 0}">
+                <h4>Top 3 bids</h4>
+                <div class="card p-2 m-1" th:each="bid : ${top3Bids}">
+                    <p>Bidder: [[${bid.bidder.name}]]</p>
+                    <p>Bid amount: [[${bid.price}]] kr</p>
+                    <p>Date: [[${bid.bidDate}]]</p>
+                </div>
+                <a th:if="${auctionItem.getBids().size() > 3}" th:href="@{/item/{id}/bids (id=${auctionItem.id})}">See all bids</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="javascript">
+    <script type="text/javascript">
+        //when category has been selected
+        let select = document.getElementById("selectCategory");
+        select.addEventListener("change", (e)=>{
+            let categoryId = select.value;
+            if (categoryId != null){
+                window.location.href = "/items/category/" + categoryId;
+            }
+        })
+
+        //show time remaining
+        let itemClosingDateString = $("#item-closing-date").text();
+        let itemClosingDate = new Date(itemClosingDateString);
+
+        let oneDayMillis = 1000 * 3600 * 24;
+        let oneHourMillis = 1000 * 3600;
+        let oneMinuteMillis = 1000 * 60;
+        let oneSecondMillis = 1000;
+
+        let currentDate = new Date();
+
+        if (itemClosingDate > currentDate){
+            setInterval(showTimeRemainingToClose, 1000);
+        }
+
+        function showTimeRemainingToClose(){
+            let currentDate = new Date();
+
+            if (itemClosingDate > currentDate){
+                // To calculate the time difference of two dates
+                let Difference_In_Time = itemClosingDate.getTime() - currentDate.getTime();
+
+                //  no. of days between two dates
+                let Difference_In_Days = Math.floor(Difference_In_Time / oneDayMillis);
+
+                //  no. of hours between two dates
+                let Difference_In_Hours = Math.floor((Difference_In_Time - (Difference_In_Days * oneDayMillis)) / oneHourMillis);
+
+                //  no. of minutes between two dates
+                let Difference_In_Minutes = Math.floor((Difference_In_Time - (((Difference_In_Hours * oneHourMillis) + (Difference_In_Days * oneDayMillis)))) / oneMinuteMillis);
+
+                //  no. of seconds between two dates
+                let Difference_In_Seconds = Math.floor((Difference_In_Time - ((Difference_In_Hours * oneHourMillis) + (Difference_In_Days * oneDayMillis) + (Difference_In_Minutes * oneMinuteMillis))) / oneSecondMillis);
+
+                let remainingStringTime = Difference_In_Days + " days " + Difference_In_Hours + " hrs " + Difference_In_Minutes + " mins " + Difference_In_Seconds + " secs";
+
+                //show remaining time to user
+                $("#ends-in").text(remainingStringTime);
+
+
+            }else{
+                setTimeout(reloadPageIn2Sec, 2000);
+            }
+        }
+
+        function reloadPageIn2Sec(){
+            window.location.reload();
+        }
+
+        //when placing a bid
+        $("#bid-form").submit(e=>{
+            e.preventDefault();
+
+            let requestData = {
+                bidPrice: $("#user-bid").val(),
+                auctionItemId: $("#auction-item").val()
+            }
+
+            let bidMessage = $("#bid-message");
+
+            $.ajax({
+                url: "/api/item/bid",
+                method: "POST",
+                contentType: "application/json; charset=utf-8",
+                dataType: "text",
+                data: JSON.stringify(requestData),
+                success: response => {
+                    console.log(response)
+                    bidMessage.removeClass("text-danger");
+                    bidMessage.addClass("text-success");
+                    bidMessage.text("Bid placed successfully");
+                    window.location.reload();
+                },
+                error: response => {
+                    bidMessage.addClass("text-danger");
+                    bidMessage.removeClass("text-success");
+                    switch (response.responseText) {
+                        case 'bid_is_less_than_top_bid':
+                            bidMessage.text("Please place a bid higher that the top bid.");
+                            break;
+                        case 'bid_is_less_than_starting_bid':
+                            bidMessage.text("Please place a bid higher than the starting bid.");
+                            break;
+                        case 'bidding_closed':
+                            bidMessage.text("Bidding has closed for this item.");
+                            window.location.reload();
+                            break;
+                        default:
+                            break;
+                    }
+                },
+            });
+
+        })
+    </script>
+</th:block>
+
+</body>
+</html>

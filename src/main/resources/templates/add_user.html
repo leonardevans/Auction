@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/main_layout}" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Auction - Add User</title>
+</head>
+<body>
+
+<div class="container" layout:fragment="content">
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item active">User</li>
+    </ol>
+    <section>
+        <div class="row">
+            <div class="table-responsive">
+                <form method="post" th:action="@{/admin/add/user}" th:object="${user}">
+                    <input type="submit" class="btn-primary btn btn-sm" value="Add user"/>
+                    <div class="mb-3">
+                        <label for="exampleFormControlInput1" class="form-label">Email address</label>
+                        <input type="email" class="form-control" required id="exampleFormControlInput1" th:field="*{email}" placeholder="name@example.com"/>
+                    </div>
+                    <div class="mb-3">
+                        <label for="exampleFormControlInput1" class="form-label">Name</label>
+                        <input type="text" class="form-control" required th:field="*{name}" />
+                    </div>
+                    <div class="form-check" th:each="role : ${allRoles}">
+                        <input type="checkbox" required name="roles"
+
+                               th:text="${role.name}"
+                               th:value="${role.id}"
+                               th:field="*{roles}"
+                        />
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </section>
+</div>
+
+<th:block layout:fragment="javascript">
+
+</th:block>
+
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/main_layout}" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Auction Item Bids</title>
+</head>
+<body>
+
+<div class="container" layout:fragment="content">
+    <div class=" mt-2">
+        <h4>All bids </h4>
+        <div class="card p-2 m-1" th:each="bid : ${bids}">
+            <p>Bidder: [[${bid.bidder.name}]]</p>
+            <p>Bid: [[${bid.price}]] kr</p>
+            <p>Date: [[${bid.bidDate}]]</p>
+        </div>
+    </div>
+
+    <!--        pagination-->
+    <div th:if="${totalPages > 1}">
+        <div class="row col-sm-10">
+            <div class="col-sm-2">
+                Total Bids: [[${totalItems}]]
+            </div>
+            <div class="col-sm-1">
+                <span th:each="i: ${#numbers.sequence(1, totalPages)}">
+                    <a th:if="${currentPage != i}" th:href="@{'/item/'+ ${auctionItemId} +'/bids/page/' + ${i}}">[[${i}]]</a>
+                    <span th:unless="${currentPage != i}">[[${i}]]</span> &nbsp; &nbsp;
+                </span>
+            </div>
+            <div class="col-sm-1">
+                <a th:if="${currentPage < totalPages}"
+                   th:href="@{'/item/'+ ${auctionItemId} +'/bids/page/' + ${currentPage + 1}}">Next</a>
+                <span th:unless="${currentPage < totalPages}">Next</span>
+            </div>
+
+            <div class="col-sm-1">
+                <a th:if="${currentPage < totalPages}" th:href="@{'/item/'+ ${auctionItemId} +'/bids/page/' + ${totalPages}}">Last</a>
+                <span th:unless="${currentPage < totalPages}">Last</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="javascript">
+
+</th:block>
+
+</body>
+</html>

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/main_layout}" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Auctions - Auth</title>
+</head>
+<body>
+
+<!--    registration form-->
+<div class="container" layout:fragment="content">
+    <div class="row">
+        <div class="col-sm-9 col-md-7 col-lg-5 mx-auto">
+            <div class="card card-signin my-5">
+                <div class="card-body">
+                    <form class="form-signin" method="post" th:action="@{/login}" autocomplete="off">
+                        <a class="btn btn-lg btn-google btn-block text-uppercase" th:href="@{/oauth2/authorize/google}"><i class="fa fa-google mr-2"></i> Login/Sign up with Google</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/main_layout}" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Auctions By Category</title>
+</head>
+<body>
+
+<div class="container" layout:fragment="content">
+    <div class="row mt-1">
+        <select id="selectCategory" class="form-select" aria-label="Default select example">
+            <option selected value="">Select Category</option>
+            <option th:each="category: ${categories}" th:value="${category.id}" th:text="${category.name}">One</option>
+        </select>
+    </div>
+
+    <div class="row mt-1">
+        <div class="col-md-2 col-lg-4 col-sm-1" th:each="auctionItem : ${auctionItems}">
+            <div class="card mx-1">
+                <div class="card-body">
+                    <img th:src="@{${auctionItem.image}}" th:alt="${auctionItem.name}" class="img-thumbnail">
+                </div>
+                <div class="card-footer">
+                    <a th:href="@{/item/{id} (id=${auctionItem.id})}">[[${auctionItem.name}]]</a>
+                    <p>Starting bid: [[${auctionItem.startingBid}]] kr</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--        pagination-->
+    <div th:if="${totalPages > 1}">
+        <div class="row col-sm-10">
+            <div class="col-sm-2">
+                Total Auction Items: [[${totalItems}]]
+            </div>
+            <div class="col-sm-1">
+            <span th:each="i: ${#numbers.sequence(1, totalPages)}">
+      <a th:if="${currentPage != i}" th:href="@{'/items/' + ${forCategoryId} +'/page/' + ${i}}">[[${i}]]</a>
+      <span th:unless="${currentPage != i}">[[${i}]]</span> &nbsp; &nbsp;
+            </span>
+            </div>
+            <div class="col-sm-1">
+                <a th:if="${currentPage < totalPages}" th:href="@{'/items/' + ${forCategoryId} +'/page/' + ${currentPage + 1}}">Next</a>
+                <span th:unless="${currentPage < totalPages}">Next</span>
+            </div>
+
+            <div class="col-sm-1">
+                <a th:if="${currentPage < totalPages}" th:href="@{'/items/' + ${forCategoryId} +'/page/' + ${totalPages}}">Last</a>
+                <span th:unless="${currentPage < totalPages}">Last</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="javascript">
+    <script type="text/javascript">
+        let select = document.getElementById("selectCategory");
+        select.addEventListener("change", (e)=>{
+            let categoryId = select.value;
+            if (categoryId != null){
+                window.location.href = "/items/category/" + categoryId;
+            }
+        })
+    </script>
+</th:block>
+
+</body>
+</html>

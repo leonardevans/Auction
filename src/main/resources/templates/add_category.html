@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/main_layout}" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Auction - Add Category</title>
+</head>
+<body>
+
+<div class="container" layout:fragment="content">
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item active">Category</li>
+    </ol>
+    <section>
+        <div class="row">
+            <div class="table-responsive">
+                <form method="post" th:action="@{/admin/add/category}" th:object="${category}">
+                    <input type="submit" class="btn-primary btn btn-sm" value="Add Category"/>
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Name</label>
+                        <input type="text" id="name" class="form-control" required th:field="*{name}"/>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+</div>
+
+<th:block layout:fragment="javascript">
+
+</th:block>
+
+</body>
+</html>

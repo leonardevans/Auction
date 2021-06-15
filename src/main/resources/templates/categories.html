@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/main_layout}" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Auction - Categories</title>
+</head>
+<body>
+
+<div class="container" layout:fragment="content">
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item active">Categories</li>
+        <li class="breadcrumb-item">
+            <a th:href="@{/admin/add/category}">
+                New Category
+            </a>
+        </li>
+    </ol>
+    <section>
+        <div class="row">
+            <div class=" text-danger" th:if="${param.not_found}">Category not found</div>
+            <div class=" text-success" th:if="${param.add_success}">Category added successfully</div>
+            <div class=" text-danger" th:if="${param.exist}">Category with given name exists</div>
+            <div class=" text-success" th:if="${param.delete_success}">Category deleted successfully</div>
+            <div class=" text-success" th:if="${param.update_success}">Category updated successfully</div>
+            <div class=" text-danger" th:if="${param.delete_error}">Failed to delete category</div>
+            <div class=" text-danger" th:if="${param.auction_item_here}">You cannot delete this category because there are auction items that belong to this category</div>
+            <div class="table-responsive">
+                <table class="table table-striped table-hover" id="dataTable">
+                    <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="category : ${categories}">
+                        <td th:text="${category.getName()}"></td>
+                        <td class="d-flex justify-content-between">
+                            <a th:href="@{/admin/edit/category/{id} (id= ${category.id})}">
+                                <i class="fa fa-edit text-primary"></i>
+                            </a>
+                            <a th:href="@{/admin/delete/category/{id} (id= ${category.id})}">
+                                <i class="fa fa-trash text-danger"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
+
+        <!--        pagination-->
+        <div th:if="${totalPages > 1}">
+            <div class="row col-sm-10">
+                <div class="col-sm-2">
+                    Total Categories: [[${totalItems}]]
+                </div>
+                <div class="col-sm-1">
+            <span th:each="i: ${#numbers.sequence(1, totalPages)}">
+      <a th:if="${currentPage != i}" th:href="@{'/categories/page/' + ${i}}">[[${i}]]</a>
+      <span th:unless="${currentPage != i}">[[${i}]]</span> &nbsp; &nbsp;
+            </span>
+                </div>
+                <div class="col-sm-1">
+                    <a th:if="${currentPage < totalPages}" th:href="@{'/categories/page/' + ${currentPage + 1}}">Next</a>
+                    <span th:unless="${currentPage < totalPages}">Next</span>
+                </div>
+
+                <div class="col-sm-1">
+                    <a th:if="${currentPage < totalPages}" th:href="@{'/categories/page/' + ${totalPages}}">Last</a>
+                    <span th:unless="${currentPage < totalPages}">Last</span>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<th:block layout:fragment="javascript">
+
+</th:block>
+
+</body>
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/main_layout}" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Auction - Edit Item</title>
+</head>
+<body>
+
+<div class="container" layout:fragment="content">
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item active">Auction Item</li>
+    </ol>
+    <section>
+        <div class="row">
+            <div class="table-responsive">
+                <form method="post" enctype="multipart/form-data" th:action="@{/seller/update/item}" th:object="${auctionItemRequest}">
+                    <input type="hidden" name="id" class="form-control" th:field="*{id}"/>
+                    <input type="submit" class="btn-primary btn btn-sm" value="Update Item"/>
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Name</label>
+                        <input type="text" id="name" class="form-control" required th:field="*{name}"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="category">Auction Category</label>
+                        <select th:field="*{category}" id="category" required class="form-select form-select-sm" aria-label=".form-select-sm example">
+                            <option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}"></option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea id="description" class="form-control" required th:field="*{description}"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="startingBid" class="form-label">Starting bid</label>
+                        <input type="number" step="any" id="startingBid" class="form-control" required th:field="*{startingBid}"/>
+                    </div>
+                    <div class="mb-3">
+                        <label for="closingDate" class="form-label">Closing date</label>
+                        <input type="datetime-local" step="any"
+                               min="2021-03-22" max="2030-12-31" id="closingDate" class="form-control" required th:field="*{closingDate}"/>
+                    </div>
+                    <div class="mb-3">
+                        <label for="closed">Closed for bidding</label>
+                        <input class="" th:field="*{closed}" type="checkbox" value="" checked id="closed"/>
+                    </div>
+                    <div class="form-group">
+                        <img th:src="@{${auctionItemRequest.imageUrl}}"  th:alt="${auctionItemRequest.getName()}" style="max-width: 200px;">
+                    </div>
+                    <div class="form-group mt-5">
+                        <label>Change Auction item image</label>
+                        <div class="input-group">
+                            <input type="file" th:field="*{image}" accept="image/*" class="form-control" />
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+</div>
+
+<th:block layout:fragment="javascript">
+
+</th:block>
+
+</body>
+</html>
